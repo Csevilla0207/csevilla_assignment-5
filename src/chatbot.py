@@ -2,7 +2,7 @@
 Description: Chatbot application.  Allows user to perform balance 
 inquiries and make deposits to their accounts.
 Author: ACE Department
-Modified by: {Student Name}
+Modified by: Kimi Sevilla
 Date: 2023-10-15
 Usage: From the console: python src/chatbot.py
 """
@@ -17,8 +17,80 @@ VALID_TASKS = {"balance", "deposit", "exit"}
 
 ## CODE REQUIRED FUNCTIONS STARTING HERE:
 
-## GIVEN CHATBOT FUNCTION
+def get_account() -> int:
+
+    try:
+        account_number = int(input("Please enter your account number: "))
+    except ValueError:
+        raise ValueError("Account number must be a whole number.")
+
+    if account_number not in ACCOUNTS:
+        raise ValueError("Account number entered does not exist.")
+
+    return account_number
+
+def get_balance(account_number):
+
+    account = ACCOUNTS.get(account_number)
+    if account:
+        return account["balance"]
+    return None
+
+def deposit(account_number, amount):
+    account = ACCOUNTS.get(account_number)
+    if account and amount > 0:
+        account["balance"] += amount
+        return True
+    return False
+
+def handle_user_input(account_number, task, amount=0):
+    if task not in VALID_TASKS:
+        return "Invalid task. Please choose from: balance, deposit, exit."
+
+    if task == "balance":
+        balance = get_balance(account_number)
+        if balance is not None:
+            return f"Your balance is: ${balance:.2f}"
+        return "Account not found."
+
+    elif task == "deposit":
+        success = deposit(account_number, amount)
+        if success:
+            return f"Deposited ${amount:.2f}. New balance is: ${get_balance(account_number):.2f}"
+        return "Deposit failed. Please check the amount and account number."
+
+    elif task == "exit":
+        return "Thank you for using the service. Goodbye!"
+
+
+
 ## REQUIRES REVISION
+
+def chatbot():
+    """Simulates a simple chatbot interaction."""
+    print("Welcome to the Bank Chatbot!")
+    
+    try:
+        account_number = get_account()
+    except ValueError as e:
+        print(f"Error: {e}")
+        return 
+
+    while True:
+        task = input("What would you like to do? (balance, deposit, exit): ").strip().lower()
+        
+        if task == "exit":
+            print(handle_user_input(account_number, task))
+            break
+        
+        if task == "deposit":
+            try:
+                amount = float(input("Enter the amount to deposit: "))
+                print(handle_user_input(account_number, task, amount))
+            except ValueError:
+                print("Please enter a valid amount.")
+        else:
+            print(handle_user_input(account_number, task))
 """
 def chatbot():
     '''
